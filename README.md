@@ -1,6 +1,6 @@
-# Personal Assistant – FastAPI + SQLite (uv)
+# DoneGlow - MyLifeOS Personal Assistant
 
- plans your day at 7:00 AM, renders an Eisenhower Matrix, schedule, Three Needles, AM/PM affirmations, a Stress Guide, and supports inbox invites + trade-off decisions. SQLite by default. Optional Anthropic integration.
+DoneGlow powered by Claude plans your day at 7:00 AM, renders an Eisenhower Matrix, schedules, provides the top Three Needle movers, AM/PM affirmations, Stress helper Guide, and supports inbox invites + trade-off decisions. SQLite by default. Anthropic integration.
 
 ## Quick Start (with uv)
 ```bash
