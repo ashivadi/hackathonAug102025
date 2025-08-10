@@ -21,7 +21,7 @@
   <!-- Run Plan -->
   <button class="px-3 py-2 rounded bg-black text-white text-sm" hx-post="/v1/plan/run" hx-swap="none"
     hx-on::after-request="htmx.ajax('GET','/v1/plan/fragment',{target:'#plan',swap:'outerHTML'})">
-    Run Today’s Plan
+    Ask Claude to Plan Today
   </button>
 
 
