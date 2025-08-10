@@ -1,0 +1,64 @@
+{% macro item_label(x) -%}
+{%- if x is mapping -%}
+{{ x.get('title') or x.get('text') or x|string }}
+{%- else -%}
+{{ x }}
+{%- endif -%}
+{%- endmacro %}
+
+<div class="border rounded-xl p-3 bg-white shadow-sm mb-4">
+  <div class="font-semibold mb-2">📌 Eisenhower Matrix</div>
+
+  {% set M = plan.matrix or {} %}
+  {# Support both our planner keys and the older names #}
+  {% set do_first = M.get('do_first') or M.get('urgent_important') or [] %}
+  {% set schedule = M.get('schedule') or M.get('not_urgent_important') or [] %}
+  {% set delegate = M.get('delegate') or M.get('urgent_not_important') or [] %}
+  {% set eliminate = M.get('eliminate') or M.get('not_urgent_not_important') or [] %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div class="border rounded-lg p-3">
+      <div class="font-medium">Urgent + Important (Do first)</div>
+      <ul class="mt-2 list-disc pl-5 text-sm">
+        {% if do_first and do_first|length %}
+        {% for t in do_first %}<li>{{ item_label(t) }}</li>{% endfor %}
+        {% else %}
+        <li class="text-slate-500">Nothing here (nice!)</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="border rounded-lg p-3">
+      <div class="font-medium">Not Urgent + Important (Schedule)</div>
+      <ul class="mt-2 list-disc pl-5 text-sm">
+        {% if schedule and schedule|length %}
+        {% for t in schedule %}<li>{{ item_label(t) }}</li>{% endfor %}
+        {% else %}
+        <li class="text-slate-500">Add one intentional block</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="border rounded-lg p-3">
+      <div class="font-medium">Urgent + Not Important (Delegate)</div>
+      <ul class="mt-2 list-disc pl-5 text-sm">
+        {% if delegate and delegate|length %}
+        {% for t in delegate %}<li>{{ item_label(t) }}</li>{% endfor %}
+        {% else %}
+        <li class="text-slate-500">Nothing to delegate right now</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="border rounded-lg p-3">
+      <div class="font-medium">Not Urgent + Not Important (Eliminate)</div>
+      <ul class="mt-2 list-disc pl-5 text-sm">
+        {% if eliminate and eliminate|length %}
+        {% for t in eliminate %}<li>{{ item_label(t) }}</li>{% endfor %}
+        {% else %}
+        <li class="text-slate-500">No time-wasters logged</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>

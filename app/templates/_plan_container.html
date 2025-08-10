@@ -1,0 +1,10 @@
+<!-- app/templates/_plan_container.html -->
+<div id="plan">
+    {% if plan %}
+    {% include '_matrix.html' %}
+    {% include '_schedule.html' %}
+    {% include '_cards.html' %}
+    {% else %}
+    <div class="text-slate-600">No plan yet. Click <em>Run Today’s Plan</em>.</div>
+    {% endif %}
+</div>

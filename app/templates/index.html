@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Header actions -->
+<div class="flex flex-wrap gap-3 mb-5">
+  <!-- Connect Google -->
+  <a href="/auth/google/start" class="px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm">
+    Connect Google Calendar
+  </a>
+
+  <a href="/chat" class="px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm">
+    Open Chat
+  </a>
+
+
+  <!-- Sync Calendar Now -->
+  <button id="syncBtn" class="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-sm">
+    Sync Calendar Now
+  </button>
+
+  <!-- Run Plan -->
+  <button class="px-3 py-2 rounded bg-black text-white text-sm" hx-post="/v1/plan/run" hx-swap="none"
+    hx-on::after-request="htmx.ajax('GET','/v1/plan/fragment',{target:'#plan',swap:'outerHTML'})">
+    Run Today’s Plan
+  </button>
+
+
+
+  <!-- Refresh -->
+  <a class="px-3 py-2 rounded border text-sm" href="/">Refresh</a>
+</div>
+
+<!-- Two-column layout: Plan + Upcoming -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <!-- Left: Plan (spans 2 cols) -->
+  <div class="lg:col-span-2">
+    <div id="plan">
+      {% if plan %}
+      {% include '_matrix.html' %}
+      {% include '_schedule.html' %}
+      {% include '_cards.html' %}
+      {% else %}
+      <div class="text-slate-600">No plan yet. Click <em>Run Today’s Plan</em>.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right: Upcoming events -->
+  <div>
+    <div class="border rounded-xl p-3 bg-white shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <div class="font-semibold">Upcoming (from Google Calendar)</div>
+        <button class="text-xs px-2 py-1 border rounded hover:bg-slate-50" onclick="loadEvents()">
+          Reload
+        </button>
+      </div>
+      <ul id="eventsList" class="divide-y text-sm">
+        <li class="py-2 text-slate-500">No events loaded yet.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- helpers ---
+  function fmt(dtIso) {
+    try {
+      const d = new Date(dtIso);
+      const opts = {
+        weekday: 'short', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      };
+      return d.toLocaleString(undefined, opts);
+    } catch { return dtIso; }
+  }
+
+  function renderEvents(evs) {
+    const ul = document.getElementById('eventsList');
+    ul.innerHTML = '';
+    if (!evs || evs.length === 0) {
+      ul.innerHTML = '<li class="py-2 text-slate-500">No upcoming events.</li>';
+      return;
+    }
+    evs.slice(0, 8).forEach(e => {
+      const li = document.createElement('li');
+      li.className = 'py-2';
+      const when = `${fmt(e.start)} — ${fmt(e.end)}`;
+      li.innerHTML = `
+        <div class="font-medium">${e.summary || '(no title)'}</div>
+        <div class="text-slate-600">${when}</div>
+        ${e.location ? `<div class="text-slate-500">${e.location}</div>` : ''}
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  async function loadEvents() {
+    try {
+      const res = await fetch('/v1/calendar/events');
+      const json = await res.json();
+      renderEvents(json.data || []);
+    } catch (e) {
+      console.error(e);
+      renderEvents([]);
+    }
+  }
+
+  async function syncCalendar() {
+    const btn = document.getElementById('syncBtn');
+    const original = btn.textContent;
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Syncing…';
+      await fetch('/v1/calendar/sync', { method: 'POST' });
+      await loadEvents();
+      btn.textContent = 'Synced ✓';
+      setTimeout(() => (btn.textContent = original, btn.disabled = false), 1200);
+    } catch (e) {
+      console.error(e);
+      btn.textContent = 'Sync failed';
+      setTimeout(() => (btn.textContent = original, btn.disabled = false), 1500);
+    }
+  }
+
+  document.getElementById('syncBtn').addEventListener('click', syncCalendar);
+
+  // Auto-load events on page load (in case you already connected Google)
+  loadEvents();
+</script>
+
+{% endblock %}

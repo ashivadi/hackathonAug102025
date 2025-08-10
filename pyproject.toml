@@ -1,7 +1,23 @@
 [project]
-name = "hackathonaug102025"
+name = "personal-assistant-fastapi-uv"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+description = "Personal Assistant MVP (FastAPI + SQLite) with planner, memory, inbox, and invite decisions."
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "SQLAlchemy>=2.0",
+  "pydantic>=2.7",
+  "python-dotenv>=1.0",
+  "httpx>=0.27",
+  "apscheduler>=3.10",
+  "jinja2>=3.1",
+  "python-multipart>=0.0.9",
+  "google-api-python-client>=2.178.0",
+  "google-auth>=2.40.3",
+  "google-auth-oauthlib>=1.2.2",
+  "google-auth-httplib2>=0.2.0",
+  "python-dateutil>=2.9.0.post0",
+  "strands-agents[anthropic]>=1.4.0",
+  "strands-agents-tools>=0.2.3",
+]

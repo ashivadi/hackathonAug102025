@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex gap-3 mb-4">
+  <button class="px-3 py-2 rounded bg-black text-white text-sm" hx-post="/v1/plan/run" hx-swap="none">Run Today's Plan</button>
+  <a class="px-3 py-2 rounded border text-sm" href="/">Refresh</a>
+</div>
+<div id="plan">
+  {% if plan %}
+    {% include '_matrix.html' %}
+    {% include '_schedule.html' %}
+    {% include '_cards.html' %}
+  {% else %}
+  <div class="text-slate-600">No plan yet. Click <em>Run Today’s Plan</em>.</div>
+  {% endif %}
+</div>
+{% endblock %}

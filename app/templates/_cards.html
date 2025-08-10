@@ -1,0 +1,21 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+  <div class="border rounded-xl p-3 bg-white shadow-sm">
+    <div class="font-semibold mb-2">Three Needles</div>
+    <div class="text-sm">
+      <div><span class="font-semibold">Money:</span> {{ plan.needles.money }}</div>
+      <div><span class="font-semibold">Health:</span> {{ plan.needles.health }}</div>
+      <div><span class="font-semibold">Relationships:</span> {{ plan.needles.relationships }}</div>
+    </div>
+  </div>
+  <div class="border rounded-xl p-3 bg-white shadow-sm">
+    <div class="font-semibold mb-2">Affirmations</div>
+    <div class="text-sm"><span class="font-semibold">AM:</span> {{ plan.affirmations.am }}</div>
+    <div class="text-sm mt-1"><span class="font-semibold">PM:</span> {{ plan.affirmations.pm }}</div>
+  </div>
+  <div class="border rounded-xl p-3 bg-white shadow-sm">
+    <div class="font-semibold mb-2">Stress Navigation Guide</div>
+    <ul class="space-y-1 text-sm list-disc pl-5">
+      {% for r in plan.stress_guide %}<li><span class="font-semibold">{{ r.trigger }}:</span> {{ r.action }}</li>{% endfor %}
+    </ul>
+  </div>
+</div>

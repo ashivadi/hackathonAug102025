@@ -1,0 +1,23 @@
+<div class="border rounded-xl p-3 bg-white shadow-sm mb-4">
+  <div class="font-semibold mb-2">🗓 Today’s Schedule</div>
+  {% set S = plan.schedule or [] %}
+  <ul class="space-y-2 text-sm">
+    {% if S %}
+    {% for s in S %}
+    {% set sstart = s.start or (s.get('start') if s is mapping else '') %}
+    {% set send = s.end or (s.get('end') if s is mapping else '') %}
+    {% set label = s.item or (s.get('item') if s is mapping else '') %}
+    {% set show_start = (sstart if sstart and sstart|length == 5 else sstart[11:16]) %}
+    {% set show_end = (send if send and send|length == 5 else send[11:16]) %}
+    <li class="flex items-start gap-2">
+      <span class="whitespace-nowrap font-medium">
+        {{ show_start }} – {{ show_end }}
+      </span>
+      <span>{{ label }}</span>
+    </li>
+    {% endfor %}
+    {% else %}
+    <li class="text-slate-500">No time blocks yet — try “Run Today’s Plan”.</li>
+    {% endif %}
+  </ul>
+</div>
