@@ -10,6 +10,10 @@ from app.db.base import Base
 from app.core.config import settings
 from app.core.time import day_bounds
 
+from app.routers import tasks as tasks_router
+from app.routers import goals_ui as goals_ui_router
+from app.routers import stress_ui as stress_ui_router
+
 # --- Import all models so create_all sees them ---
 from app.models import (
     user,
@@ -41,7 +45,7 @@ from app.routers import (
 # Create tables (SQLite)
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Personal Assistant (FastAPI)")
+app = FastAPI(title="DoneGlow - My Personal Assistant")
 
 # Register routers (order doesn't really matter)
 app.include_router(plan_router.router)
@@ -52,6 +56,9 @@ app.include_router(chat_router.router)
 app.include_router(goals_router.router)
 app.include_router(google_auth_router.router)
 app.include_router(calendar_router.router)
+app.include_router(tasks_router.router)
+app.include_router(goals_ui_router.router)
+app.include_router(stress_ui_router.router)
 
 templates = Jinja2Templates(directory="app/templates")
 

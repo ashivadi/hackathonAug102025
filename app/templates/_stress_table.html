@@ -1,0 +1,45 @@
+<div id="stressTable" class="border rounded-xl bg-white shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+            <tr>
+                <th class="text-left p-2">Trigger</th>
+                <th class="text-left p-2">Pattern</th>
+                <th class="text-left p-2">Coping</th>
+                <th class="text-right p-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if items and items|length %}
+            {% for s in items %}
+            <tr class="border-t">
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ s.trigger }}" name="trigger"
+                        hx-patch="/v1/stress/{{ s.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#stressTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ s.pattern or '' }}" name="pattern"
+                        hx-patch="/v1/stress/{{ s.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#stressTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ s.coping or '' }}" name="coping"
+                        hx-patch="/v1/stress/{{ s.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#stressTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2 text-right">
+                    <button class="px-2 py-1 text-xs rounded border text-red-600" hx-delete="/v1/stress/{{ s.id }}"
+                        hx-target="#stressTable" hx-swap="outerHTML">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="p-3 text-slate-500" colspan="4">Nothing yet. Add a trigger above.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

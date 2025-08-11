@@ -1,0 +1,55 @@
+<div id="goalsTable" class="border rounded-xl bg-white shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+            <tr>
+                <th class="text-left p-2">Horizon</th>
+                <th class="text-left p-2">Goal</th>
+                <th class="text-left p-2">Metric / Notes</th>
+                <th class="text-left p-2">Target</th>
+                <th class="text-right p-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if goals and goals|length %}
+            {% for g in goals %}
+            <tr class="border-t">
+                <td class="p-2">
+                    <select class="border rounded px-2 py-1" hx-patch="/v1/goals/{{ g.id }}" hx-include="closest tr"
+                        name="horizon" hx-trigger="change" hx-target="#goalsTable" hx-swap="outerHTML">
+                        {% for opt in ['short','long','14d','90d','12m'] %}
+                        <option value="{{ opt }}" {{ 'selected' if g.horizon==opt }}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ g.text }}" name="text"
+                        hx-patch="/v1/goals/{{ g.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#goalsTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ g.metric or '' }}" name="metric"
+                        hx-patch="/v1/goals/{{ g.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#goalsTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1"
+                        value="{{ g.target if g.target is not none else '' }}" name="target"
+                        hx-patch="/v1/goals/{{ g.id }}" hx-include="closest tr" hx-trigger="change"
+                        hx-target="#goalsTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2 text-right">
+                    <button class="px-2 py-1 text-xs rounded border text-red-600" hx-delete="/v1/goals/{{ g.id }}"
+                        hx-target="#goalsTable" hx-swap="outerHTML">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="p-3 text-slate-500" colspan="5">No goals yet. Add one above.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl">
+    <div class="flex items-center justify-between mb-3">
+        <h1 class="text-2xl font-bold">Goals</h1>
+        <a href="/" class="text-sm text-slate-600 hover:underline">← Back to dashboard</a>
+    </div>
+
+    <form class="mb-4 grid grid-cols-1 md:grid-cols-5 gap-2" hx-post="/v1/goals" hx-target="#goalsTable"
+        hx-swap="outerHTML">
+        <select name="horizon" class="border rounded px-3 py-2">
+            <option value="short">Short</option>
+            <option value="long">Long</option>
+            <option value="14d">14d</option>
+            <option value="90d">90d</option>
+            <option value="12m">12m</option>
+        </select>
+        <input name="text" class="border rounded px-3 py-2 md:col-span-2" placeholder="What is the goal?" required>
+        <input name="metric" class="border rounded px-3 py-2" placeholder="Why / by when (optional)">
+        <input name="target" class="border rounded px-3 py-2" placeholder="Target (number optional)">
+        <button class="px-3 py-2 bg-black text-white rounded text-sm md:col-span-5">Add Goal</button>
+    </form>
+
+    <div id="goalsTable" hx-get="/v1/goals/fragment" hx-trigger="load" hx-swap="outerHTML"></div>
+</div>
+{% endblock %}

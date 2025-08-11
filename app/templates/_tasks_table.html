@@ -1,0 +1,56 @@
+<div id="tasksTable" class="border rounded-xl bg-white shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+            <tr>
+                <th class="text-left p-2">Task</th>
+                <th class="text-left p-2">Pillar</th>
+                <th class="text-left p-2">Impact</th>
+                <th class="text-left p-2">Due</th>
+                <th class="text-right p-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if tasks and tasks|length %}
+            {% for t in tasks %}
+            <tr class="border-t {{ 'opacity-60 line-through' if t.status=='done' }}">
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ t.title }}" hx-patch="/v1/tasks/{{ t.id }}"
+                        hx-include="closest tr" name="title" hx-trigger="change" hx-target="#tasksTable"
+                        hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ t.pillar or '' }}"
+                        hx-patch="/v1/tasks/{{ t.id }}" hx-include="closest tr" name="pillar" hx-trigger="change"
+                        hx-target="#tasksTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1" value="{{ t.impact or 3 }}"
+                        hx-patch="/v1/tasks/{{ t.id }}" hx-include="closest tr" name="impact" hx-trigger="change"
+                        hx-target="#tasksTable" hx-swap="outerHTML">
+                </td>
+                <td class="p-2">
+                    <input class="w-full border rounded px-2 py-1"
+                        value="{{ (t.due_at.isoformat()[:16]) if t.due_at else '' }}" hx-patch="/v1/tasks/{{ t.id }}"
+                        hx-include="closest tr" name="dueAt" hx-trigger="change" hx-target="#tasksTable"
+                        hx-swap="outerHTML">
+                </td>
+                <td class="p-2 text-right">
+                    <button class="px-2 py-1 text-xs rounded border mr-1" hx-post="/v1/tasks/{{ t.id }}/toggle"
+                        hx-target="#tasksTable" hx-swap="outerHTML">
+                        {{ 'Reopen' if t.status=='done' else 'Done' }}
+                    </button>
+                    <button class="px-2 py-1 text-xs rounded border text-red-600" hx-delete="/v1/tasks/{{ t.id }}"
+                        hx-target="#tasksTable" hx-swap="outerHTML">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="p-3 text-slate-500" colspan="5">No tasks yet. Add one above.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

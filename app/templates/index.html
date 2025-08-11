@@ -5,30 +5,38 @@
 <div class="flex flex-wrap gap-3 mb-5">
   <!-- Connect Google -->
   <a href="/auth/google/start" class="px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm">
-    Connect Google Calendar
+    1. Connect GCal
   </a>
-
-  <a href="/chat" class="px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm">
-    Open Chat
-  </a>
-
 
   <!-- Sync Calendar Now -->
   <button id="syncBtn" class="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-sm">
-    Sync Calendar Now
+    2. Sync Cal
   </button>
+
+  <a href="/chat" class="px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm">
+    3. Share Goals/Stress/Tasks with Claude
+  </a>
 
   <!-- Run Plan -->
   <button class="px-3 py-2 rounded bg-black text-white text-sm" hx-post="/v1/plan/run" hx-swap="none"
     hx-on::after-request="htmx.ajax('GET','/v1/plan/fragment',{target:'#plan',swap:'outerHTML'})">
-    Ask Claude to Plan Today
+    4. Ask Claude to Plan
   </button>
+
+
 
 
 
   <!-- Refresh -->
   <a class="px-3 py-2 rounded border text-sm" href="/">Refresh</a>
 </div>
+
+<div class="mb-4 flex items-center gap-2">
+  <a href="/tasks" class="px-3 py-2 rounded border text-sm">Manage Tasks</a>
+  <a href="/goals" class="px-3 py-2 rounded border text-sm">Edit Goals</a>
+  <a href="/stress" class="px-3 py-2 rounded border text-sm">Stress & Triggers</a>
+</div>
+
 
 <!-- Two-column layout: Plan + Upcoming -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -40,7 +48,8 @@
       {% include '_schedule.html' %}
       {% include '_cards.html' %}
       {% else %}
-      <div class="text-slate-600">No plan yet. Click <em>Run Today’s Plan</em>.</div>
+      <div class="text-slate-600">No plan yet. <em>Connect your Calender and Sync. Then Ask Claude to Plan
+          Today.</em>.</div>
       {% endif %}
     </div>
   </div>

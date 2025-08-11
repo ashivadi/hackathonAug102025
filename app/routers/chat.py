@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from app.services.agent_chat import build_agent
 
@@ -16,6 +17,8 @@ async def chat_ask(body: ChatIn):
         agent = build_agent(username=body.username)
         result = await agent.invoke_async(body.message)
         reply = str(result)
-        return {"ok": True, "reply": reply}
+
+        # Return in a consistent format for the UI
+        return JSONResponse({"ok": True, "markdown": reply})
     except Exception as e:
-        return {"ok": False, "error": str(e)}
+        return JSONResponse({"ok": False, "markdown": f"**Error:** {e}"})

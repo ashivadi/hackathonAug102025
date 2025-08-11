@@ -1,87 +1,115 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-3xl">
-    <h2 class="text-xl font-bold mb-3">Chat with your assistant</h2>
-
-    <div id="goalBanner" class="mb-3 hidden border rounded-xl bg-white shadow-sm p-3 text-sm"></div>
-
-    <div class="flex gap-2 mb-3">
-        <input id="username" class="border rounded px-3 py-2 text-sm flex-1" placeholder="Your name (e.g., Nidhi)"
-            value="Nidhi" />
+<div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+        <a href="/" class="px-3 py-2 text-sm border rounded hover:bg-slate-100">← Back</a>
+        <h1 class="text-xl font-semibold">Chat</h1>
     </div>
-
-    <div id="chat"
-        class="prose prose-sm max-w-none border rounded-xl bg-white shadow-sm p-3 h-96 overflow-y-auto space-y-4">
-        <div class="text-slate-600"><strong>Assistant:</strong> Hi Nidhi! Tell me a goal you’re working toward, a task
-            to add, or anything that’s stressing you. I can also plan your day when you say <code>plan my day</code>.
-        </div>
+    <div class="text-sm text-slate-500">
+        Tip: type <code>plan my day</code>
     </div>
-
-    <form class="mt-3 flex gap-2" onsubmit="sendMsg(event)">
-        <input id="msg" class="border rounded px-3 py-2 text-sm flex-1" placeholder="Type a message…" />
-        <button class="px-3 py-2 bg-black text-white rounded text-sm">Send</button>
-    </form>
 </div>
 
-<!-- Markdown renderer -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Chat -->
+    <div class="md:col-span-2">
+        <div id="chatBox" class="border rounded-xl bg-white shadow-sm p-4 h-[65vh] overflow-y-auto text-sm"></div>
+
+        <form id="chatForm" class="mt-3 flex gap-2" onsubmit="sendChat(event)">
+            <input id="chatInput" class="flex-1 border rounded px-3 py-2"
+                placeholder="Say hi, share a goal, or ask me to plan your day…" />
+            <button class="px-3 py-2 bg-black text-white rounded text-sm">Send</button>
+        </form>
+    </div>
+
+    <!-- Sidebar quick actions -->
+    <aside class="space-y-3">
+        <div class="border rounded-xl bg-white shadow-sm p-3">
+            <div class="font-semibold mb-2 text-sm">Quick actions</div>
+            <div class="flex flex-wrap gap-2">
+                <button class="px-2 py-1 text-xs border rounded" onclick="quick('plan my day')">Plan my day</button>
+                <button class="px-2 py-1 text-xs border rounded"
+                    onclick="quick('add task: 30m workout, impact 4, pillar health')">Add workout</button>
+                <button class="px-2 py-1 text-xs border rounded" onclick="quick('my short goals')">Show short
+                    goals</button>
+            </div>
+        </div>
+        <div class="border rounded-xl bg-white shadow-sm p-3">
+            <div class="font-semibold mb-2 text-sm">Calendar</div>
+            <button class="px-2 py-1 text-xs border rounded w-full" hx-post="/v1/calendar/sync" hx-swap="none">Sync
+                now</button>
+        </div>
+    </aside>
+</div>
 
 <script>
-    async function loadGoals() {
-        try {
-            const res = await fetch('/v1/goals/list');
-            const j = await res.json();
-            const b = document.getElementById('goalBanner');
-            if (!j.ok || !j.data || j.data.length === 0) { b.classList.add('hidden'); return; }
-            const short = j.data.filter(g => (g.horizon || '').startsWith('short') || ['14d', '90d'].includes(g.horizon));
-            const long = j.data.filter(g => (g.horizon || '').startsWith('long') || ['12m'].includes(g.horizon));
-            b.classList.remove('hidden');
-            b.innerHTML = `
-      <div class="font-semibold mb-1">Your saved goals</div>
-      ${short.length ? `<div><span class="font-semibold">Short-term:</span> ${short.map(g => g.text).join(', ')}</div>` : ''}
-      ${long.length ? `<div><span class="font-semibold">Long-term:</span> ${long.map(g => g.text).join(', ')}</div>` : ''}
-    `;
-        } catch { }
+    const box = document.getElementById('chatBox');
+
+    function addLine(role, text) {
+        const el = document.createElement('div');
+        el.className = 'mb-3';
+        el.innerHTML = `<div class="text-xs uppercase text-slate-500">${role}</div>
+                  <div class="prose prose-sm max-w-none">${sanitize(text)}</div>`;
+        box.appendChild(el);
+        box.scrollTop = box.scrollHeight;
     }
-    loadGoals();
 
-    async function sendMsg(e) {
+    function sanitize(t) {
+        // very simple: keep markdown chars, escape HTML, allow line breaks
+        return (t ?? '').toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+    }
+
+    async function sendChat(e) {
         e.preventDefault();
-        const chat = document.getElementById('chat');
-        const msgEl = document.getElementById('msg');
-        const username = document.getElementById('username').value || 'Nidhi';
-        const text = msgEl.value.trim();
-        if (!text) return;
-
-        // You message
-        const you = document.createElement('div');
-        you.className = 'text-slate-700';
-        you.innerHTML = `<strong>You:</strong> ${text}`;
-        chat.appendChild(you); chat.scrollTop = chat.scrollHeight;
-
-        msgEl.value = '';
+        const input = document.getElementById('chatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        addLine('You', msg);
+        input.value = '';
 
         try {
-            const res = await fetch('/v1/chat/ask', {
+            const r = await fetch('/v1/chat/ask', {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ username, message: text })
+                body: JSON.stringify({ username: 'Nidhi', message: msg })
             });
-            const json = await res.json();
 
-            const bot = document.createElement('div');
-            if (json.ok) {
-                // Render assistant Markdown
-                bot.innerHTML = marked.parse(json.reply || '');
+            // prefer JSON, but be resilient if server sends text
+            let data, md = '';
+            const ct = r.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+                data = await r.json().catch(() => null);
+                md = (data && (data.markdown || data.text || data.reply)) || '';
             } else {
-                bot.innerHTML = `<div class="text-red-600">Error: ${json.error}</div>`;
+                const txt = await r.text();
+                // sometimes APIs dump JSON-then-markdown as one blob; try to extract markdown part
+                try {
+                    const j = JSON.parse(txt);
+                    md = j.markdown || j.text || j.reply || '';
+                    if (!md) md = txt;
+                } catch {
+                    md = txt; // plain text
+                }
             }
-            chat.appendChild(bot); chat.scrollTop = chat.scrollHeight;
+
+            addLine('Assistant', md || '(no response)');
         } catch (err) {
-            const bot = document.createElement('div');
-            bot.innerHTML = `<div class="text-red-600">Error: ${String(err)}</div>`;
-            chat.appendChild(bot); chat.scrollTop = chat.scrollHeight;
+            addLine('Assistant', `*(network error: ${err?.message || err})*`);
         }
     }
+
+    function quick(text) {
+        document.getElementById('chatInput').value = text;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+
+    window.addEventListener('load', () => {
+        addLine('Assistant', 'Hi Nidhi! Tell me a goal you’re working toward, a task to add, or anything that’s stressing you. I can also plan your day when you say <b>“plan my day”</b>.');
+    });
 </script>
+
 {% endblock %}

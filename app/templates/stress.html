@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl">
+    <div class="flex items-center justify-between mb-3">
+        <h1 class="text-2xl font-bold">Stress & Triggers</h1>
+        <a href="/" class="text-sm text-slate-600 hover:underline">← Back to dashboard</a>
+    </div>
+
+    <form class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-2" hx-post="/v1/stress" hx-target="#stressTable"
+        hx-swap="outerHTML">
+        <input name="trigger" class="border rounded px-3 py-2" placeholder="Trigger (e.g., calendar overload)" required>
+        <input name="pattern" class="border rounded px-3 py-2" placeholder="Pattern (optional)">
+        <input name="coping" class="border rounded px-3 py-2" placeholder="Coping (optional)">
+        <button class="px-3 py-2 bg-black text-white rounded text-sm md:col-span-3">Add</button>
+    </form>
+
+    <div id="stressTable" hx-get="/v1/stress/fragment" hx-trigger="load" hx-swap="outerHTML"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl">
+    <div class="flex items-center justify-between mb-3">
+        <h1 class="text-2xl font-bold">Tasks</h1>
+        <a href="/" class="text-sm text-slate-600 hover:underline">← Back to dashboard</a>
+    </div>
+
+    <form class="mb-4 grid grid-cols-1 md:grid-cols-5 gap-2" hx-post="/v1/tasks" hx-target="#tasksTable"
+        hx-swap="outerHTML">
+        <input name="title" class="border rounded px-3 py-2 md:col-span-2" placeholder="Task title" required>
+        <input name="pillar" class="border rounded px-3 py-2" placeholder="Pillar (Health, Money, etc.)">
+        <input name="impact" class="border rounded px-3 py-2" placeholder="Impact 1–5" value="3">
+        <input name="dueAt" class="border rounded px-3 py-2" placeholder="Due (YYYY-MM-DDTHH:MM)">
+        <button class="px-3 py-2 bg-black text-white rounded text-sm md:col-span-5">Add Task</button>
+    </form>
+
+    <div id="tasksTable" hx-get="/v1/tasks/fragment" hx-trigger="load" hx-swap="outerHTML"></div>
+</div>
+{% endblock %}
